@@ -1,9 +1,22 @@
 sudo: false
 
 language: node_js
-node_js:
-  - "8"
-  - "10"
+node_js: "10"
 
 script:
   - npm test
+
+deploy:
+  # Make a commit and a tag if an update was found.
+  - provider: script
+    skip_cleanup: true
+    script: node scripts/push.js
+    on:
+      branch: master
+      condition: ! git diff --exit-code --quiet
+  # Publish on tags.
+  - provider: npm
+    email: "star.ctor+bot@gmail.com"
+    api_key: $NPM_TOKEN
+    on:
+      tags: true

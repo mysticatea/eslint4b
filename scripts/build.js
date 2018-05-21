@@ -4,17 +4,16 @@
  */
 "use strict"
 
-const cp = require("child_process")
 const path = require("path")
 const log = require("fancy-log")
 const fs = require("fs-extra")
-const pEvent = require("p-event")
 const rollup = require("rollup")
 const babel = require("rollup-plugin-babel")
 const commonjs = require("rollup-plugin-commonjs")
 const json = require("rollup-plugin-json")
 const modify = require("rollup-plugin-re")
 const sourcemaps = require("rollup-plugin-sourcemaps")
+const exec = require("./lib/exec")
 const replace = require("./rollup-plugin/replace")
 const resolve = require("./rollup-plugin/resolve")
 
@@ -120,25 +119,33 @@ const resolve = require("./rollup-plugin/resolve")
     })
 
     //--------------------------------------------------------------------------
-    log.info("Update dependencies.")
+    log.info("Check version.")
 
     const eslintPkg = await fs.readJSON(require.resolve("eslint/package.json"))
     const pkg = await fs.readJSON("package.json")
 
-    pkg.dependencies = {}
-    for (const id of Array.from(dependencySet).sort()) {
-        if (eslintPkg.dependencies[id]) {
-            pkg.dependencies[id] = eslintPkg.dependencies[id]
+    if (pkg.version === eslintPkg.version) {
+        log.info("Up to date: %s", pkg.version)
+    } else {
+        log.info("Update was found: %s → %s", pkg.version, eslintPkg.version)
+        log.info("Update dependencies.")
+
+        pkg.version = eslintPkg.version
+        pkg.dependencies = {}
+
+        for (const id of Array.from(dependencySet).sort()) {
+            if (eslintPkg.dependencies[id]) {
+                pkg.dependencies[id] = eslintPkg.dependencies[id]
+            }
         }
+
+        await fs.writeJSON("package.json", pkg, { spaces: 2 })
+
+        await exec("npm", "install")
+        await exec("git", "diff", "--color-words", "--", "package.json")
     }
 
-    await fs.writeJSON("package.json", pkg, { spaces: 2 })
-
-    await pEvent(
-        cp.spawn("npm", ["install"], { shell: true, stdio: "inherit" }),
-        "close"
-    )
-
+    //--------------------------------------------------------------------------
     log.info("Completed!")
 })().catch(error => {
     log.error(error.stack)
