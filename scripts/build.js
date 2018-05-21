@@ -10,6 +10,7 @@ const log = require("fancy-log")
 const fs = require("fs-extra")
 const pEvent = require("p-event")
 const rollup = require("rollup")
+const babel = require("rollup-plugin-babel")
 const commonjs = require("rollup-plugin-commonjs")
 const json = require("rollup-plugin-json")
 const modify = require("rollup-plugin-re")
@@ -90,6 +91,18 @@ const resolve = require("./rollup-plugin/resolve")
                         replace: "createMissingRule(ruleId)",
                     },
                 ],
+            }),
+            babel({
+                babelrc: false,
+                include: "**/*.js",
+                plugins: [
+                    [
+                        "transform-inline-environment-variables",
+                        { include: ["NODE_ENV", "TIMING"] },
+                    ],
+                ],
+                presets: ["minify"],
+                sourceMaps: true,
             }),
             json({ preferConst: true }),
             commonjs(),

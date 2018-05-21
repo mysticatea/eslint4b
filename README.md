@@ -66,10 +66,8 @@ Please use GitHub issues/PRs.
 
 ### Development tools
 
-- `npm install` installs dependencies for development.
-- `npm test` runs tests and measures code coverage.
-- `npm run clean` removes temporary files of tests.
-- `npm run build` generates the modified [Linter] class from the current `node_modules/eslint`.
+- `npm test` runs tests.
+- `npm run build` build ESLint which works in browsers.
 
 [Linter]: https://eslint.org/docs/developer-guide/nodejs-api#linter
 [Webpack]: https://webpack.js.org/

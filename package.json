@@ -29,6 +29,9 @@
   },
   "devDependencies": {
     "@types/node": "^10.1.1",
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "babel-preset-minify": "^0.4.3",
     "browserify": "^16.2.2",
     "eslint": "^4.19.1",
     "eslint-plugin-mysticatea": "^5.0.0-beta.11",
@@ -42,6 +45,7 @@
     "p-event": "^1.3.0",
     "puppeteer": "^1.4.0",
     "rollup": "^0.59.1",
+    "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-re": "^1.0.7",
@@ -49,8 +53,9 @@
   },
   "scripts": {
     "build": "node scripts/build",
+    "lint": "eslint scripts test .eslintrc.js karma.conf.js",
     "pretest": "node scripts/build",
-    "test": "karma start -c scripts/karma.conf.js --single-run"
+    "test": "npm run -s lint && karma start --single-run"
   },
   "repository": {
     "type": "git",
