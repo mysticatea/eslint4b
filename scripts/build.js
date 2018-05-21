@@ -130,7 +130,7 @@ const resolve = require("./rollup-plugin/resolve")
         log.info("Update was found: %s → %s", pkg.version, eslintPkg.version)
         log.info("Update dependencies.")
 
-        pkg.version = eslintPkg.version
+        pkg.version = `${eslintPkg.version}-test.0`
         pkg.dependencies = {}
 
         for (const id of Array.from(dependencySet).sort()) {
@@ -142,7 +142,7 @@ const resolve = require("./rollup-plugin/resolve")
         await fs.writeJSON("package.json", pkg, { spaces: 2 })
 
         await exec("npm", "install")
-        await exec("git", "diff", "--color-words", "--", "package.json")
+        await exec("git", "diff", "--color-words", "-U1", "--", "package.json")
     }
 
     //--------------------------------------------------------------------------
