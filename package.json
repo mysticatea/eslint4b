@@ -55,7 +55,9 @@
     "build": "node scripts/build",
     "lint": "eslint scripts test .eslintrc.js karma.conf.js",
     "pretest": "node scripts/build",
-    "test": "npm run -s lint && karma start --single-run"
+    "test": "npm run -s lint && karma start --single-run",
+    "preversion": "npm test",
+    "postversion": "git push --tags && git push"
   },
   "repository": {
     "type": "git",
