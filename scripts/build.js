@@ -65,7 +65,7 @@ const resolve = require("./rollup-plugin/resolve")
                 dependencySet.add(w.source.split("/")[0])
                 return
             }
-            console.warn(w.code, w.message) //eslint-disable-line no-console
+            log.warn(w.code, w.message)
         },
         plugins: [
             replace({
