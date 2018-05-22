@@ -5,10 +5,10 @@
 "use strict"
 
 const path = require("path")
+const babel = require("babel-core")
 const log = require("fancy-log")
 const fs = require("fs-extra")
 const rollup = require("rollup")
-const babel = require("rollup-plugin-babel")
 const commonjs = require("rollup-plugin-commonjs")
 const json = require("rollup-plugin-json")
 const modify = require("rollup-plugin-re")
@@ -23,6 +23,7 @@ const resolve = require("./rollup-plugin/resolve")
     log.info("Remove 'dist'.")
 
     await fs.remove("dist")
+    await fs.ensureDir("dist")
 
     //--------------------------------------------------------------------------
     log.info("Update 'scripts/shim/core-rules.js'.")
@@ -49,7 +50,7 @@ const resolve = require("./rollup-plugin/resolve")
     )
 
     //--------------------------------------------------------------------------
-    log.info("Create a bundle.")
+    log.info("Parse the source files.")
 
     const dependencySet = new Set()
     const bundle = await rollup.rollup({
@@ -91,18 +92,6 @@ const resolve = require("./rollup-plugin/resolve")
                     },
                 ],
             }),
-            babel({
-                babelrc: false,
-                include: "**/*.js",
-                plugins: [
-                    [
-                        "transform-inline-environment-variables",
-                        { include: ["NODE_ENV", "TIMING"] },
-                    ],
-                ],
-                presets: ["minify"],
-                sourceMaps: true,
-            }),
             json({ preferConst: true }),
             commonjs(),
             sourcemaps(),
@@ -110,13 +99,53 @@ const resolve = require("./rollup-plugin/resolve")
     })
 
     //--------------------------------------------------------------------------
-    log.info("Write files.")
+    log.info("Generate file contents.")
 
-    await bundle.write({
-        dir: "dist",
+    const contents = await bundle.generate({
         format: "cjs",
         sourcemap: true,
     })
+
+    //--------------------------------------------------------------------------
+    log.info("Minify file contents.")
+
+    const promises = []
+
+    for (const filename of Object.keys(contents)) {
+        log.info("- %s", filename)
+
+        const filePath = path.join("dist", filename)
+        const raw = contents[filename]
+        const { code, map } = babel.transform(raw.code, {
+            ast: false,
+            babelrc: false,
+            comments: false,
+            filename,
+            filenameRelative: filePath,
+            inputSourceMap: raw.map,
+            minified: true,
+            plugins: [
+                [
+                    "transform-inline-environment-variables",
+                    { include: ["NODE_ENV", "TIMING"] },
+                ],
+            ],
+            presets: ["minify"],
+            sourceMaps: true,
+            sourceRoot: process.cwd(),
+            sourceType: "script",
+        })
+
+        promises.push(
+            fs.writeFile(
+                filePath,
+                `${code}//# sourceMappingURL=${filename}.map`
+            ),
+            fs.writeFile(`${filePath}.map`, JSON.stringify(map))
+        )
+    }
+
+    await Promise.all(promises)
 
     //--------------------------------------------------------------------------
     log.info("Check version.")
@@ -130,7 +159,7 @@ const resolve = require("./rollup-plugin/resolve")
         log.info("Update was found: %s → %s", pkg.version, eslintPkg.version)
         log.info("Update dependencies.")
 
-        pkg.version = `${eslintPkg.version}-test.1`
+        pkg.version = eslintPkg.version
         pkg.dependencies = {}
 
         for (const id of Array.from(dependencySet).sort()) {
