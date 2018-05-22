@@ -30,7 +30,7 @@ npm install eslint4b
 Use a bundler such as [Webpack]. The `eslint4b` must be able to be bundled.
 
 ```js
-const Linter = require("eslint4b")
+const Linter = require("eslint4b") // import Linter from "eslint4b"
 const linter = new Linter();
 
 // Verify a code.
@@ -52,11 +52,21 @@ It's lightweight than the full set.
 ```js
 // This Linter doesn't include any core rules.
 const Linter = require("eslint4b/dist/linter")
+
+// You can load core rules individually.
+const { indent, quotes, semi } = require("eslint4b/dist/core-rules")
+const linter = new Linter()
+linter.defineRule("indent", indent)
+linter.defineRule("quotes", quotes)
+linter.defineRule("semi", semi)
 ```
 
 ## 📰 Changelog
 
-- See [GitHub releases](https://github.com/mysticatea/eslint4b/releases).
+See [GitHub releases](https://github.com/mysticatea/eslint4b/releases).
+
+If no description, it's the build of ESLint in the same version.
+It doesn't have any notable change.
 
 ## ❤️ Contributing
 
