@@ -154,14 +154,16 @@ const resolve = require("./rollup-plugin/resolve")
 
     const eslintPkg = await fs.readJSON(require.resolve("eslint/package.json"))
     const pkg = await fs.readJSON("package.json")
+    const expectedVar = `${eslintPkg.version}+web`
+    const actualVar = pkg.version
 
-    if (pkg.version === eslintPkg.version) {
-        log.info("Up to date: %s", pkg.version)
+    if (actualVar === expectedVar) {
+        log.info("Up to date: %s", actualVar)
     } else {
-        log.info("Update was found: %s → %s", pkg.version, eslintPkg.version)
+        log.info("Update was found: %s → %s", actualVar, expectedVar)
         log.info("Update dependencies.")
 
-        pkg.version = eslintPkg.version
+        pkg.version = expectedVar
         pkg.dependencies = {}
 
         for (const id of Array.from(dependencySet).sort()) {
