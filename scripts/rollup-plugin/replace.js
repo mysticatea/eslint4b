@@ -21,6 +21,7 @@ module.exports = mapping => {
         const from = toAbsolute(key)
         const to = toAbsolute(mapping[key])
 
+        map.set(key, to)
         map.set(from, to)
     }
 
