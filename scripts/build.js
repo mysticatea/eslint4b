@@ -13,6 +13,7 @@ const commonjs = require("rollup-plugin-commonjs")
 const json = require("rollup-plugin-json")
 const modify = require("rollup-plugin-re")
 const sourcemaps = require("rollup-plugin-sourcemaps")
+const removeUnusedRequireCalls = require("./babel-plugin/remove-unused-require-calls")
 const exec = require("./lib/exec")
 const replace = require("./rollup-plugin/replace")
 const resolve = require("./rollup-plugin/resolve")
@@ -129,6 +130,7 @@ const resolve = require("./rollup-plugin/resolve")
                     "transform-inline-environment-variables",
                     { include: ["NODE_ENV", "TIMING"] },
                 ],
+                removeUnusedRequireCalls,
             ],
             presets: ["minify"],
             sourceMaps: true,
