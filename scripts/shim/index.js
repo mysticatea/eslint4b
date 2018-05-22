@@ -8,8 +8,6 @@ export default class Linter extends BaseLinter {
     /** Initialize this linter and define core rules. */
     constructor() {
         super()
-        for (const ruleId of Object.keys(coreRules)) {
-            this.defineRule(ruleId, coreRules[ruleId])
-        }
+        this.defineRules(coreRules)
     }
 }
