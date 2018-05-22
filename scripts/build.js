@@ -130,7 +130,7 @@ const resolve = require("./rollup-plugin/resolve")
         log.info("Update was found: %s → %s", pkg.version, eslintPkg.version)
         log.info("Update dependencies.")
 
-        pkg.version = `${eslintPkg.version}-test.0`
+        pkg.version = `${eslintPkg.version}-test.1`
         pkg.dependencies = {}
 
         for (const id of Array.from(dependencySet).sort()) {

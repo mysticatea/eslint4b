@@ -39,7 +39,7 @@ const TOKEN = process.env.GITHUB_TOKEN
         "git",
         "push",
         `https://mysticatea:${TOKEN}@github.com/mysticatea/eslint4b.git`,
-        "master",
+        "HEAD:master",
         pkg.version
     )
 
