@@ -154,7 +154,7 @@ const resolve = require("./rollup-plugin/resolve")
 
     const eslintPkg = await fs.readJSON(require.resolve("eslint/package.json"))
     const pkg = await fs.readJSON("package.json")
-    const expectedVar = `${eslintPkg.version}-test.2`
+    const expectedVar = eslintPkg.version
     const actualVar = pkg.version
 
     if (actualVar === expectedVar) {
