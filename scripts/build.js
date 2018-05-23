@@ -13,6 +13,7 @@ const commonjs = require("rollup-plugin-commonjs")
 const json = require("rollup-plugin-json")
 const modify = require("rollup-plugin-re")
 const sourcemaps = require("rollup-plugin-sourcemaps")
+const semver = require("semver")
 const removeUnusedRequireCalls = require("./babel-plugin/remove-unused-require-calls")
 const exec = require("./lib/exec")
 const replace = require("./rollup-plugin/replace")
@@ -154,18 +155,28 @@ const resolve = require("./rollup-plugin/resolve")
 
     const eslintPkg = await fs.readJSON(require.resolve("eslint/package.json"))
     const pkg = await fs.readJSON("package.json")
-    const expectedVar = eslintPkg.version
-    const actualVar = pkg.version
+    const lastVer = await fs.readFile(".last-version", "utf8")
+    const expectedVer = eslintPkg.version
 
-    if (actualVar === expectedVar) {
-        log.info("Up to date: %s", actualVar)
+    if (expectedVer === lastVer) {
+        log.info("Up to date: %s", expectedVer)
     } else {
-        log.info("Update was found: %s → %s", actualVar, expectedVar)
+        log.info("Update was found: %s → %s", lastVer, expectedVer)
+
+        //----------------------------------------------------------------------
+        if (semver.lt(pkg.version, expectedVer)) {
+            pkg.version = expectedVer
+        } else {
+            // For some reason, this package version is larger than the original version.
+            // Increment this package version.
+            pkg.version = semver.inc(pkg.version, "patch")
+            log.info("The new version is '%s' for some reason.", pkg.version)
+        }
+
+        //----------------------------------------------------------------------
         log.info("Update dependencies.")
 
-        pkg.version = expectedVar
         pkg.dependencies = {}
-
         for (const id of Array.from(dependencySet).sort()) {
             if (eslintPkg.dependencies[id]) {
                 pkg.dependencies[id] = eslintPkg.dependencies[id]
@@ -173,7 +184,7 @@ const resolve = require("./rollup-plugin/resolve")
         }
 
         await fs.writeJSON("package.json", pkg, { spaces: 2 })
-
+        await fs.writeFile(".last-version", expectedVer)
         await exec("npm", "install")
         await exec("git", "diff", "--color-words", "-U1", "--", "package.json")
     }
