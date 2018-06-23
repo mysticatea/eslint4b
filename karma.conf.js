@@ -5,7 +5,6 @@ process.env.CHROME_BIN = require("puppeteer").executablePath() //eslint-disable-
 
 module.exports = function(config) {
     config.set({
-        browserify: { debug: true },
         browsers: ["MyHeadlessChrome"],
         customLaunchers: {
             MyHeadlessChrome: {
@@ -17,10 +16,14 @@ module.exports = function(config) {
                 ],
             },
         },
-        files: ["test/*.js"],
-        frameworks: ["browserify", "mocha"],
+        files: [{ pattern: "test/*.js", watched: false }],
+        frameworks: ["mocha"],
         preprocessors: {
-            "test/*.js": ["browserify"],
+            "test/*.js": ["webpack", "sourcemap"],
+        },
+        webpack: {
+            mode: "development",
+            devtool: "inline-source-map",
         },
     })
 }
