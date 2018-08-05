@@ -1,6 +1,6 @@
 {
   "name": "eslint4b",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "ESLint which works in browsers.",
   "engines": {
     "node": ">=7.6.0"
@@ -25,7 +25,7 @@
     "lodash": "^4.17.5",
     "minimatch": "^3.0.4",
     "natural-compare": "^1.4.0",
-    "regexpp": "^1.1.0"
+    "regexpp": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^10.1.1",
