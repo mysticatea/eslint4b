@@ -1,6 +1,6 @@
 {
   "name": "eslint4b",
-  "version": "5.6.0",
+  "version": "5.6.1",
   "description": "ESLint which works in browsers.",
   "engines": {
     "node": ">=7.6.0"
