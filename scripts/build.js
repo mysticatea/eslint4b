@@ -74,6 +74,7 @@ const resolve = require("./rollup-plugin/resolve")
                 fs: "./scripts/shim/empty.js",
                 debug: "./scripts/shim/debug.js",
                 "eslint/lib/load-rules.js": "./scripts/shim/load-rules.js",
+                "eslint/lib/built-in-rules-index.js": "./scripts/shim/empty.js",
             }),
             resolve(),
             modify({
