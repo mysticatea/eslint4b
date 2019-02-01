@@ -5,7 +5,7 @@
 "use strict"
 
 const path = require("path")
-const babel = require("babel-core")
+const babel = require("@babel/core")
 const log = require("fancy-log")
 const fs = require("fs-extra")
 const rollup = require("rollup")
@@ -30,12 +30,11 @@ const resolve = require("./rollup-plugin/resolve")
     //--------------------------------------------------------------------------
     log.info("Update 'scripts/shim/core-rules.js'.")
 
-    const ruleFiles = await fs.readdir(
-        path.resolve("node_modules/eslint/lib/rules")
-    )
-    const ruleIds = ruleFiles
-        .filter(filename => /^[a-z].+\.js$/.test(filename))
-        .map(filename => path.basename(filename, ".js"))
+    const ruleDir = path.resolve("node_modules/eslint/lib/rules")
+    const ruleFiles = (await fs.readdir(ruleDir))
+        .filter(filename => /^[a-z].+\.js$/u.test(filename))
+        .map(filename => path.join(ruleDir, filename))
+    const ruleIds = ruleFiles.map(filename => path.basename(filename, ".js"))
     const importDecls = ruleIds
         .map(
             (ruleId, index) =>
@@ -56,19 +55,25 @@ const resolve = require("./rollup-plugin/resolve")
 
     const dependencySet = new Set()
     const bundle = await rollup.rollup({
-        experimentalCodeSplitting: true,
+        external(filePath) {
+            const id = filePath.replace(/\\/gu, "/").split("/")[0]
+            if (
+                id === "" ||
+                id === "." ||
+                id === ".." ||
+                id.endsWith(":") ||
+                id === "eslint"
+            ) {
+                return false
+            }
+            dependencySet.add(id)
+            return true
+        },
         input: [
             "scripts/shim/linter.js",
             "scripts/shim/core-rules.js",
             "scripts/shim/index.js",
         ],
-        onwarn(w) {
-            if (w.code === "UNRESOLVED_IMPORT") {
-                dependencySet.add(w.source.split("/")[0])
-                return
-            }
-            log.warn(w.code, w.message)
-        },
         plugins: [
             replace({
                 fs: "./scripts/shim/empty.js",
@@ -81,16 +86,16 @@ const resolve = require("./rollup-plugin/resolve")
                 patterns: [
                     // Remove a dynamic import for parsers.
                     {
-                        match: /eslint(\/|\\)lib(\/|\\)linter\.js$/,
-                        test: /require\(parserName\)/,
+                        match: /eslint(\/|\\)lib(\/|\\)linter\.js$/u,
+                        test: /require\(parserName\)/u,
                         replace:
                             //eslint-disable-next-line no-template-curly-in-string
                             '(parserName === "espree" ? require("espree") : (() => { throw new Error(`Cannot find module \'${parserName}\'`) })())',
                     },
                     // Remove a dynamic import for rules (I suspect this is a dead code).
                     {
-                        match: /eslint(\/|\\)lib(\/|\\)rules\.js$/,
-                        test: /normalizeRule\(require\(this\._rules\[ruleId\]\)\)/,
+                        match: /eslint(\/|\\)lib(\/|\\)rules\.js$/u,
+                        test: /normalizeRule\(require\(this\._rules\[ruleId\]\)\)/u,
                         replace: "createMissingRule(ruleId)",
                     },
                 ],
@@ -104,7 +109,7 @@ const resolve = require("./rollup-plugin/resolve")
     //--------------------------------------------------------------------------
     log.info("Generate file contents.")
 
-    const contents = await bundle.generate({
+    const { output } = await bundle.generate({
         format: "cjs",
         sourcemap: true,
     })
@@ -114,18 +119,17 @@ const resolve = require("./rollup-plugin/resolve")
 
     const promises = []
 
-    for (const filename of Object.keys(contents)) {
-        log.info("- %s", filename)
+    for (const { code: rawCode, fileName, map: rawMap } of output) {
+        log.info("- %s", fileName)
 
-        const filePath = path.join("dist", filename)
-        const raw = contents[filename]
-        const { code, map } = babel.transform(raw.code, {
+        const filePath = path.join("dist", fileName)
+        const { code, map } = babel.transform(rawCode, {
             ast: false,
             babelrc: false,
             comments: false,
-            filename,
+            filename: fileName,
             filenameRelative: filePath,
-            inputSourceMap: raw.map,
+            inputSourceMap: rawMap,
             minified: true,
             plugins: [
                 [
@@ -143,7 +147,7 @@ const resolve = require("./rollup-plugin/resolve")
         promises.push(
             fs.writeFile(
                 filePath,
-                `${code}//# sourceMappingURL=${filename}.map`
+                `${code}//# sourceMappingURL=${fileName}.map`
             ),
             fs.writeFile(`${filePath}.map`, JSON.stringify(map))
         )
