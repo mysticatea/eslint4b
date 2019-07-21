@@ -27,7 +27,7 @@ const TOKEN = process.env.GITHUB_TOKEN
     const pkg = await fs.readJSON("package.json")
 
     await exec("git", "add", ".")
-    await exec("git", "commit", "-m", `🔖 ${pkg.version}`)
+    await exec("git", "commit", "-m", `"🔖 ${pkg.version}"`)
 
     //--------------------------------------------------------------------------
     log.info("Make a tag.", pkg.version)
