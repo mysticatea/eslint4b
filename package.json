@@ -1,9 +1,9 @@
 {
   "name": "eslint4b",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "ESLint which works in browsers.",
   "engines": {
-    "node": ">=7.6.0"
+    "node": "^8.10.0 || ^10.13.0 || >=11.10.1"
   },
   "main": "dist/index.js",
   "files": [
