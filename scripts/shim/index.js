@@ -1,5 +1,5 @@
 import BaseLinter from "eslint/lib/linter"
-import coreRules from "./core-rules.js"
+import coreRules from "./core-rules"
 
 /**
  * Linter with core rules.

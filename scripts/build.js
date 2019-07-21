@@ -54,6 +54,11 @@ const resolve = require("./rollup-plugin/resolve")
     log.info("Parse the source files.")
 
     const dependencySet = new Set()
+    const input = [
+        "scripts/shim/linter.js",
+        "scripts/shim/core-rules.js",
+        "scripts/shim/index.js",
+    ]
     const bundle = await rollup.rollup({
         external(filePath) {
             const id = filePath.replace(/\\/gu, "/").split("/")[0]
@@ -62,18 +67,18 @@ const resolve = require("./rollup-plugin/resolve")
                 id === "." ||
                 id === ".." ||
                 id.endsWith(":") ||
-                id === "eslint"
+                id === "eslint" ||
+                input.includes(filePath)
             ) {
                 return false
             }
-            dependencySet.add(id)
+            if (!dependencySet.has(id)) {
+                log.info("Found external link: %o (from %o)", id, filePath)
+                dependencySet.add(id)
+            }
             return true
         },
-        input: [
-            "scripts/shim/linter.js",
-            "scripts/shim/core-rules.js",
-            "scripts/shim/index.js",
-        ],
+        input,
         plugins: [
             replace({
                 fs: "./scripts/shim/empty.js",
