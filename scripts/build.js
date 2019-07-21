@@ -171,6 +171,7 @@ const resolve = require("./rollup-plugin/resolve")
             pkg.version = semver.inc(pkg.version, "patch")
             log.info("The new version is '%s' for some reason.", pkg.version)
         }
+        pkg.engines = eslintPkg.engines
 
         //----------------------------------------------------------------------
         log.info("Update dependencies.")
