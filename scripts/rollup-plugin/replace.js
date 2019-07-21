@@ -28,7 +28,7 @@ module.exports = mapping => {
         resolveId(id, importerPath) {
             const importeePath =
                 id.startsWith("./") || id.startsWith("../")
-                    ? Module.createRequireFromPath(importerPath).resolve(id)
+                    ? Module.createRequire(importerPath).resolve(id)
                     : id
 
             return map.get(importeePath) || null
