@@ -31,10 +31,12 @@ const resolve = require("./rollup-plugin/resolve")
     log.info("Update 'scripts/shim/core-rules.js'.")
 
     const ruleDir = path.resolve("node_modules/eslint/lib/rules")
-    const ruleFiles = (await fs.readdir(ruleDir))
-        .filter(filename => /^[a-z].+\.js$/u.test(filename))
-        .map(filename => path.join(ruleDir, filename))
-    const ruleIds = ruleFiles.map(filename => path.basename(filename, ".js"))
+    const ruleIds = (await fs.readdir(ruleDir))
+        .filter(
+            filename =>
+                /^[a-z-]+\.js$/u.test(filename) && filename !== "index.js"
+        )
+        .map(filename => path.basename(filename, ".js"))
     const importDecls = ruleIds
         .map(
             (ruleId, index) =>
@@ -72,36 +74,23 @@ const resolve = require("./rollup-plugin/resolve")
             ) {
                 return false
             }
-            if (!dependencySet.has(id)) {
-                log.info("Found external link: %o (from %o)", id, filePath)
-                dependencySet.add(id)
-            }
+            dependencySet.add(id)
             return true
         },
         input,
         plugins: [
             replace({
-                fs: "./scripts/shim/empty.js",
                 debug: "./scripts/shim/debug.js",
-                "eslint/lib/load-rules.js": "./scripts/shim/load-rules.js",
-                "eslint/lib/built-in-rules-index.js": "./scripts/shim/empty.js",
+                "eslint/lib/rules/index.js": "./scripts/shim/rules-index.js",
             }),
             resolve(),
             modify({
                 patterns: [
-                    // Remove a dynamic import for parsers.
-                    {
-                        match: /eslint(\/|\\)lib(\/|\\)linter\.js$/u,
-                        test: /require\(parserName\)/u,
-                        replace:
-                            //eslint-disable-next-line no-template-curly-in-string
-                            '(parserName === "espree" ? require("espree") : (() => { throw new Error(`Cannot find module \'${parserName}\'`) })())',
-                    },
                     // Remove a dynamic import for rules (I suspect this is a dead code).
                     {
-                        match: /eslint(\/|\\)lib(\/|\\)rules\.js$/u,
-                        test: /normalizeRule\(require\(this\._rules\[ruleId\]\)\)/u,
-                        replace: "createMissingRule(ruleId)",
+                        match: /eslint(\/|\\)lib(\/|\\)linter(\/|\\)rules\.js$/u,
+                        test: /require\(this\._rules\[ruleId\]\)/u,
+                        replace: "null",
                     },
                 ],
             }),
@@ -152,7 +141,7 @@ const resolve = require("./rollup-plugin/resolve")
         promises.push(
             fs.writeFile(
                 filePath,
-                `${code}//# sourceMappingURL=${fileName}.map`
+                `${code}\n//# sourceMappingURL=${fileName}.map`
             ),
             fs.writeFile(`${filePath}.map`, JSON.stringify(map))
         )

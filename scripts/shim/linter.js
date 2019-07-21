@@ -1,2 +1,2 @@
-import Linter from "eslint/lib/linter"
+import { Linter } from "eslint/lib/linter"
 export default Linter

@@ -3,6 +3,7 @@
  * See LICENSE file in root directory for full license.
  */
 const path = require("path")
+const Module = require("module")
 
 /**
  * Convert a given moduleId to an absolute path.
@@ -24,8 +25,13 @@ module.exports = mapping => {
     }
 
     return {
-        resolveId(id) {
-            return map.get(id) || null
+        resolveId(id, importerPath) {
+            const importeePath =
+                id.startsWith("./") || id.startsWith("../")
+                    ? Module.createRequireFromPath(importerPath).resolve(id)
+                    : id
+
+            return map.get(importeePath) || null
         },
     }
 }
