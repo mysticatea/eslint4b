@@ -14,6 +14,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
       with: { fetch-depth: 1 }
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with: { node-version: 12.x }
     - name: Install Packages
       run: npm install
     - name: Check ESLint Version
@@ -26,6 +29,8 @@ jobs:
       run: |
         if ! git diff --exit-code --quiet
         then
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git add .
           git commit -m "🔖 ${VERSION}"
           git tag "v$VERSION"
