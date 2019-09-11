@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    tags:
+    - v*
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with: { fetch-depth: 1 }
+    - name: Install Packages
+      run: npm install
+    - name: Test
+      run: npm test
+    - name: Publish
+      uses: actions/npm@v2.0.0
+      with:
+        args: publish
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

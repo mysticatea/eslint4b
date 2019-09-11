@@ -1,4 +1,4 @@
+!/.github
 /dist
 /node_modules
 /scripts/shim/core-rules.js
-!.eslintrc.js

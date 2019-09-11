@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches:
+    - master
+  schedule:
+  - cron: 0 0 * * *
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with: { fetch-depth: 1 }
+    - name: Install Packages
+      run: npm install
+    - name: Check ESLint Version
+      uses: ./.github/actions/get-eslint-versions
+      id: versions
+    - name: Test
+      run: npm test
+      if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
+    - name: Bump Version
+      run: |
+        if ! git diff --exit-code --quiet
+        then
+          git add .
+          git commit -m "🔖 ${VERSION}"
+          git tag "v$VERSION"
+          git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master "v${VERSION}"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ steps.versions.outputs.installed }}
+      if: success() && steps.versions.outputs.installed != steps.versions.outputs.published

@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/eslint4b.svg)](https://www.npmjs.com/package/eslint4b)
 [![Downloads/month](https://img.shields.io/npm/dm/eslint4b.svg)](http://www.npmtrends.com/eslint4b)
-[![Build Status](https://travis-ci.org/mysticatea/eslint4b.svg?branch=master)](https://travis-ci.org/mysticatea/eslint4b)
+[![Build Status](https://github.com/mysticatea/eslint4b/workflows/CI/badge.svg)](https://github.com/mysticatea/eslint4b/actions)
 [![Dependency Status](https://david-dm.org/mysticatea/eslint4b.svg)](https://david-dm.org/mysticatea/eslint4b)
 
 ESLint which works in browsers.
@@ -15,7 +15,7 @@ This package provides the [Linter] class which is modified to work in browsers.
 - Eliminate the dependency to `fs`.
 - Eliminate the dynamic `require()`s.
 
-This package is kept latest with cron jobs Travis CI provides.
+This package is kept latest with cron jobs GitHub Actions provide.
 
 ## 💿 Installation
 

@@ -34,13 +34,13 @@ const resolve = require("./rollup-plugin/resolve")
     const ruleIds = (await fs.readdir(ruleDir))
         .filter(
             filename =>
-                /^[a-z-]+\.js$/u.test(filename) && filename !== "index.js"
+                /^[a-z-]+\.js$/u.test(filename) && filename !== "index.js",
         )
         .map(filename => path.basename(filename, ".js"))
     const importDecls = ruleIds
         .map(
             (ruleId, index) =>
-                `import _${index} from "eslint/lib/rules/${ruleId}"`
+                `import _${index} from "eslint/lib/rules/${ruleId}"`,
         )
         .join("\n")
     const exportDecls = ruleIds
@@ -49,7 +49,7 @@ const resolve = require("./rollup-plugin/resolve")
 
     await fs.writeFile(
         "scripts/shim/core-rules.js",
-        `${importDecls}\nexport default {\n${exportDecls}\n}\n`
+        `${importDecls}\nexport default {\n${exportDecls}\n}\n`,
     )
 
     //--------------------------------------------------------------------------
@@ -141,9 +141,9 @@ const resolve = require("./rollup-plugin/resolve")
         promises.push(
             fs.writeFile(
                 filePath,
-                `${code}\n//# sourceMappingURL=${fileName}.map`
+                `${code}\n//# sourceMappingURL=${fileName}.map`,
             ),
-            fs.writeFile(`${filePath}.map`, JSON.stringify(map))
+            fs.writeFile(`${filePath}.map`, JSON.stringify(map)),
         )
     }
 

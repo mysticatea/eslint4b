@@ -1,0 +1,10 @@
+name: Get ESLint Versions
+description: Get ESLint Versions
+outputs:
+  installed:
+    description: Installed ESLint Version
+  published:
+    description: Published Eslint4b Version.
+runs:
+  using: node12
+  main: index.js

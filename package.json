@@ -28,6 +28,7 @@
     "regexpp": "^2.0.1"
   },
   "devDependencies": {
+    "@actions/core": "^1.1.0",
     "@babel/core": "^7.5.5",
     "@mysticatea/eslint-plugin": "^11.0.0",
     "@types/node": "^12.6.8",
@@ -54,7 +55,7 @@
   },
   "scripts": {
     "build": "node scripts/build",
-    "lint": "eslint scripts test .eslintrc.js karma.conf.js",
+    "lint": "eslint scripts test karma.conf.js",
     "pretest": "node scripts/build",
     "test": "npm run -s lint && karma start --single-run",
     "preversion": "npm test",
