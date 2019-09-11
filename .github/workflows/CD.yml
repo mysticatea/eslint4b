@@ -1,12 +1,12 @@
-name: CI
+name: CD
 on:
   push:
     tags:
-    - v*
+    - "v*"
 
 jobs:
-  build:
-    name: Build
+  publish:
+    name: Publish
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
