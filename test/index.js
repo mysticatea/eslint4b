@@ -22,7 +22,7 @@ describe("index.js", () => {
         assert.strictEqual(messages.length, 1)
         assert.strictEqual(
             messages[0].message,
-            "Unexpected var, use let or const instead."
+            "Unexpected var, use let or const instead.",
         )
     })
 
@@ -34,7 +34,7 @@ describe("index.js", () => {
             {
                 parserOptions: { ecmaVersion: 2015 },
                 rules: { "no-var": 2, "prefer-const": 2 },
-            }
+            },
         )
 
         assert.strictEqual(fixed, true)

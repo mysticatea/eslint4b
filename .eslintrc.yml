@@ -5,3 +5,8 @@ extends:
 overrides:
 - files: "**/shim/*.js"
   extends: plugin:@mysticatea/+modules
+  rules:
+    "@mysticatea/node/no-unsupported-features/es-syntax":
+    - error
+    - ignores:
+      - modules

@@ -10,7 +10,7 @@ const pEvent = require("p-event")
 module.exports = async (command, ...args) => {
     const exitCode = await pEvent(
         cp.spawn(command, args, { shell: true, stdio: "inherit" }),
-        "close"
+        "close",
     )
     if (exitCode) {
         throw new Error(`Failed to run: ${command} ${args.join(" ")}`)
