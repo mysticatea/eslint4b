@@ -40,3 +40,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         VERSION: ${{ steps.versions.outputs.installed }}
       if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
+    - name: Publish
+      uses: actions/npm@v2.0.0
+      with:
+        args: publish
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
