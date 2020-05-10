@@ -111,32 +111,37 @@ const resolve = require("./rollup-plugin/resolve")
     //--------------------------------------------------------------------------
     log.info("Minify file contents.")
 
+    process.env.NODE_ENV = ""
+    process.env.TIMING = ""
     const promises = []
 
     for (const { code: rawCode, fileName, map: rawMap } of output) {
         log.info("- %s", fileName)
 
         const filePath = path.join("dist", fileName)
-        const { code, map } = babel.transform(rawCode, {
-            ast: false,
-            babelrc: false,
-            comments: false,
-            filename: fileName,
-            filenameRelative: filePath,
-            inputSourceMap: rawMap,
-            minified: true,
-            plugins: [
-                [
-                    "transform-inline-environment-variables",
-                    { include: ["NODE_ENV", "TIMING"] },
-                ],
-                removeUnusedRequireCalls,
+        let code = rawCode
+        let map = rawMap
+        for (const plugin of [
+            removeUnusedRequireCalls,
+            [
+                "transform-inline-environment-variables",
+                { include: ["NODE_ENV", "TIMING"] },
             ],
-            presets: ["minify"],
-            sourceMaps: true,
-            sourceRoot: process.cwd(),
-            sourceType: "script",
-        })
+            "babel-plugin-minify-constant-folding",
+            "babel-plugin-minify-dead-code-elimination",
+        ]) {
+            ;({ code, map } = babel.transform(code, {
+                ast: false,
+                babelrc: false,
+                comments: false,
+                compact: false,
+                filename: fileName,
+                inputSourceMap: map,
+                plugins: [plugin],
+                sourceMaps: true,
+                sourceType: "script",
+            }))
+        }
 
         promises.push(
             fs.writeFile(
