@@ -1,6 +1,6 @@
 {
   "name": "eslint4b",
-  "version": "7.21.0",
+  "version": "7.22.0",
   "description": "ESLint which works in browsers.",
   "engines": {
     "node": "^10.12.0 || >=12.0.0"
@@ -19,10 +19,10 @@
     "esquery": "^1.4.0",
     "esutils": "^2.0.2",
     "functional-red-black-tree": "^1.0.1",
-    "globals": "^12.1.0",
+    "globals": "^13.6.0",
     "ignore": "^4.0.6",
     "levn": "^0.4.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "natural-compare": "^1.4.0",
     "regexpp": "^3.1.0"
   },
