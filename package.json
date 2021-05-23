@@ -1,6 +1,6 @@
 {
   "name": "eslint4b",
-  "version": "7.26.0",
+  "version": "7.27.0",
   "description": "ESLint which works in browsers.",
   "engines": {
     "node": "^10.12.0 || >=12.0.0"
@@ -12,6 +12,7 @@
   "dependencies": {
     "debug": "^4.0.1",
     "doctrine": "^3.0.0",
+    "escape-string-regexp": "^4.0.0",
     "eslint-scope": "^5.1.1",
     "eslint-utils": "^2.1.0",
     "eslint-visitor-keys": "^2.0.0",
@@ -22,7 +23,7 @@
     "globals": "^13.6.0",
     "ignore": "^4.0.6",
     "levn": "^0.4.1",
-    "lodash": "^4.17.21",
+    "lodash.merge": "^4.6.2",
     "natural-compare": "^1.4.0",
     "regexpp": "^3.1.0"
   },
