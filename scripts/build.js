@@ -6,6 +6,7 @@
 
 const path = require("path")
 const babel = require("@babel/core")
+const { builtinRules } = require("eslint/use-at-your-own-risk");
 const log = require("fancy-log")
 const fs = require("fs-extra")
 const rollup = require("rollup")
@@ -30,26 +31,13 @@ const resolve = require("./rollup-plugin/resolve")
     //--------------------------------------------------------------------------
     log.info("Update 'scripts/shim/core-rules.js'.")
 
-    const ruleDir = path.resolve("node_modules/eslint/lib/rules")
-    const ruleIds = (await fs.readdir(ruleDir))
-        .filter(
-            filename =>
-                /^[a-z-]+\.js$/u.test(filename) && filename !== "index.js",
-        )
-        .map(filename => path.basename(filename, ".js"))
-    const importDecls = ruleIds
-        .map(
-            (ruleId, index) =>
-                `import _${index} from "eslint/lib/rules/${ruleId}"`,
-        )
-        .join("\n")
-    const exportDecls = ruleIds
-        .map((ruleId, index) => `    "${ruleId}": _${index},`)
+    const exportDecls = [...builtinRules.keys()]
+        .map((ruleId) => `    "${ruleId}": builtinRules.get("${ruleId}"),`)
         .join("\n")
 
     await fs.writeFile(
         "scripts/shim/core-rules.js",
-        `${importDecls}\nexport default {\n${exportDecls}\n}\n`,
+        `const { builtinRules } = require("eslint/use-at-your-own-risk")\nexport default {\n${exportDecls}\n}\n`,
     )
 
     //--------------------------------------------------------------------------
@@ -81,7 +69,6 @@ const resolve = require("./rollup-plugin/resolve")
         plugins: [
             replace({
                 debug: "./scripts/shim/debug.js",
-                "eslint/lib/rules/index.js": "./scripts/shim/rules-index.js",
             }),
             resolve(),
             modify({
