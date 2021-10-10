@@ -1,4 +1,4 @@
-import { Linter as BaseLinter } from "eslint/lib/linter"
+import { Linter as BaseLinter } from "eslint"
 import coreRules from "./core-rules"
 
 /**

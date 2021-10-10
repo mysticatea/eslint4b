@@ -11,39 +11,39 @@ jobs:
     name: Keep Latest
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-      with: { fetch-depth: 1 }
-    - name: Install Node.js
-      uses: actions/setup-node@v1
-      with: { node-version: 12.x }
-    - name: Install Packages
-      run: npm install
-    - name: Check ESLint Version
-      uses: ./.github/actions/get-eslint-versions
-      id: versions
-    - name: Test
-      run: npm test
-      if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
-    - name: Bump Version
-      run: |
-        if ! git diff --exit-code --quiet
-        then
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git add .
-          git commit -m "🔖 ${VERSION}"
-          git tag "v$VERSION"
-          git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master "v${VERSION}"
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: ${{ steps.versions.outputs.installed }}
-      if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
-    - name: Publish
-      run: |
-        npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-        npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install Packages
+        run: npm install
+      - name: Check ESLint Version
+        uses: ./.github/actions/get-eslint-versions
+        id: versions
+      - name: Test
+        run: npm test
+        if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
+      - name: Bump Version
+        run: |
+          if ! git diff --exit-code --quiet
+          then
+            git config user.name "${GITHUB_ACTOR}"
+            git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+            git add .
+            git commit -m "🔖 ${VERSION}"
+            git tag "v$VERSION"
+            git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master "v${VERSION}"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.versions.outputs.installed }}
+        if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
+      - name: Publish
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: success() && steps.versions.outputs.installed != steps.versions.outputs.published
