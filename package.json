@@ -1,5 +1,5 @@
 {
-  "name": "eslint4b",
+  "name": "eslint4b-umd",
   "version": "7.32.0",
   "description": "ESLint which works in browsers.",
   "engines": {
@@ -30,14 +30,20 @@
   "devDependencies": {
     "@actions/core": "^1.2.4",
     "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/runtime": "^7.12.5",
     "@mysticatea/eslint-plugin": "^11.0.0",
     "@types/node": "^12.12.38",
+    "babel-loader": "^8.1.0",
     "babel-plugin-minify-constant-folding": "^0.5.0",
     "babel-plugin-minify-dead-code-elimination": "^0.5.1",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "cache-loader": "^4.1.0",
     "eslint": "^7.0.0",
     "fancy-log": "^1.3.3",
     "fs-extra": "^9.0.0",
+    "http-server": "^14.1.1",
     "karma": "^5.0.5",
     "karma-chrome-launcher": "^3.0.0",
     "karma-mocha": "^1.3.0",
@@ -52,15 +58,20 @@
     "rollup-plugin-re": "^1.0.7",
     "rollup-plugin-sourcemaps": "^0.6.2",
     "semver": "^7.3.2",
-    "webpack": "^4.43.0"
+    "thread-loader": "^3.0.1",
+    "webpack": "^4.43.0",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-cleanup-plugin": "^0.5.1"
   },
   "scripts": {
-    "build": "node scripts/build",
+    "build": "node scripts/build && npm run umd",
+    "umd": "node scripts/build-umd",
     "lint": "eslint scripts test karma.conf.js",
     "pretest": "node scripts/build",
     "test": "npm run -s lint && karma start --single-run",
     "preversion": "npm test",
-    "postversion": "git push --tags && git push"
+    "postversion": "git push --tags && git push",
+    "proxy": "http-server ./dist --port 8889"
   },
   "repository": {
     "type": "git",
